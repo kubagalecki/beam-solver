@@ -170,7 +170,7 @@ public:
     using index_t	    = std::int_fast64_t;
     using entry_t	    = std::pair< std::pair<index_t, index_t>, T >;
     using data_t	    = std::vector<entry_t>;
-    using data_iter_t   = data_t::const_iterator;
+    using data_iter_t   = typename data_t::const_iterator;
     using part_t        = std::vector<data_iter_t>;
 
     static BlockSparseMatrix assembleBSMatrix(data_t&&, const index_t&, const index_t&, const size_t&);
@@ -480,7 +480,7 @@ BlockSparseMatrix< Block2D<double, 2> > assembleStiffnessMatrix(const size_t n_p
         }
     }
 
-    std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+    std::sort(std::execution::par, entries.begin(), entries.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
 
     entries.erase(accumulate_consecutive(entries.begin(), entries.end(),
                                       [](const auto& a, const auto& b) { return a.first == b.first; },
