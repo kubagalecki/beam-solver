@@ -2,30 +2,30 @@
 
 namespace ParLib
 {
-    // Thread and mutex pools
-    std::vector<std::thread>	                                            thread_pool{};
-    std::unique_ptr<std::mutex[]>	                                        mutex_pool;
-    size_t                                                                  number_of_threads = 0;
-    std::vector<std::thread::id>                                            thread_ids{};
+// Thread and mutex pools
+std::vector< std::thread >      thread_pool{};
+std::unique_ptr< std::mutex[] > mutex_pool;
+size_t                          number_of_threads = 0;
+std::vector< std::thread::id >  thread_ids{};
 
-    // Syncing stuff
-    std::mutex                                                              sync_mutex;
-    size_t                                                                  sync_counter = 0;
-    std::condition_variable                                                 sync_var;
-    bool                                                                    sync_flag = false;
+// Syncing stuff
+std::mutex              sync_mutex;
+size_t                  sync_counter = 0;
+std::condition_variable sync_var;
+bool                    sync_flag = false;
 
-    // Timing stuff
-    std::map< size_t, std::chrono::time_point<std::chrono::steady_clock> >  tics;
-    std::mutex                                                              tic_mutex;
-}
+// Timing stuff
+std::map< size_t, std::chrono::time_point< std::chrono::steady_clock > > tics;
+std::mutex                                                               tic_mutex;
+} // namespace ParLib
 
 unsigned int self_id()
 {
-    const auto ttid = std::this_thread::get_id();
+    const auto ttid       = std::this_thread::get_id();
     const auto thread_ptr = ParLib::thread_ids.data();
-    const auto dl = [&]()
-    {
-        return std::distance(thread_ptr, std::find(thread_ptr, thread_ptr + ParLib::number_of_threads, ttid));
+    const auto dl         = [&]() {
+        return std::distance(thread_ptr,
+                             std::find(thread_ptr, thread_ptr + ParLib::number_of_threads, ttid));
     };
     auto ret = dl();
 
@@ -42,7 +42,7 @@ unsigned int no_threads()
 
 void init_mutex(const size_t& n_mutex)
 {
-    ParLib::mutex_pool = std::unique_ptr<std::mutex[]>(new std::mutex[n_mutex]);
+    ParLib::mutex_pool = std::unique_ptr< std::mutex[] >(new std::mutex[n_mutex]);
 }
 
 void mutex_lock(const size_t& mutex_no)
@@ -57,13 +57,13 @@ void mutex_unlock(const size_t& mutex_no)
 
 void sync()
 {
-    using ParLib::sync_mutex;
     using ParLib::sync_counter;
     using ParLib::sync_flag;
+    using ParLib::sync_mutex;
     using ParLib::sync_var;
 
     // Acquire mutex
-    std::unique_lock<std::mutex> lock(sync_mutex);
+    std::unique_lock< std::mutex > lock(sync_mutex);
 
     // If previous sync is still happening, wait until all threads exit
     if (sync_flag)
@@ -76,7 +76,7 @@ void sync()
     if (sync_counter == no_threads())
         sync_flag = true;
 
-        // Wait until all threads arrive at sync
+    // Wait until all threads arrive at sync
     else
         sync_var.wait(lock, []() -> bool { return ParLib::sync_flag; });
 
@@ -93,13 +93,13 @@ void sync()
 
 void tic(const size_t& tic_id = 0)
 {
-    std::lock_guard<std::mutex> tic_lock(ParLib::tic_mutex);
+    std::lock_guard< std::mutex > tic_lock(ParLib::tic_mutex);
     ParLib::tics[tic_id] = std::chrono::steady_clock::now();
 }
 
 double toc(const size_t& tic_id = 0)
 {
-    std::lock_guard<std::mutex> toc_lock(ParLib::tic_mutex);
+    std::lock_guard< std::mutex > toc_lock(ParLib::tic_mutex);
 
     const auto tic_it = ParLib::tics.find(tic_id);
 
@@ -109,5 +109,6 @@ double toc(const size_t& tic_id = 0)
         return 0;
     }
     else
-        return std::chrono::duration<double>(std::chrono::steady_clock::now() - (*tic_it).second).count();
+        return std::chrono::duration< double >(std::chrono::steady_clock::now() - (*tic_it).second)
+            .count();
 }

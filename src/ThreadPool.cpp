@@ -2,14 +2,14 @@
 
 auto ThreadPool::get_exec_fun()
 {
-    return [this](){
+    return [this]() {
         while (true)
         {
-            std::function<void()> work;
+            std::function< void() > work;
 
             {
-                std::unique_lock<std::mutex> lock(pool_mutex);
-                wait_var.wait(lock, [&]() {return terminate_flag || !work_queue.empty();});
+                std::unique_lock< std::mutex > lock(pool_mutex);
+                wait_var.wait(lock, [&]() { return terminate_flag || !work_queue.empty(); });
 
                 if (!work_queue.empty())
                 {
@@ -29,7 +29,7 @@ auto ThreadPool::get_exec_fun()
 
                 if (n_busy == 0)
                 {
-                    std::unique_lock<std::mutex> lock(pool_mutex);
+                    std::unique_lock< std::mutex > lock(pool_mutex);
                     complete_var.notify_all();
                 }
             }
@@ -41,8 +41,9 @@ auto ThreadPool::get_exec_fun()
 
 ThreadPool::ThreadPool(size_t nt) : thread_pool(nt), terminate_flag(false), n_busy(0)
 {
-    std::generate(thread_pool.begin(), thread_pool.end(),
-            [exec_fun = get_exec_fun()](){return std::thread{exec_fun};});
+    std::generate(thread_pool.begin(), thread_pool.end(), [exec_fun = get_exec_fun()]() {
+        return std::thread{exec_fun};
+    });
 }
 
 ThreadPool::~ThreadPool()
@@ -60,8 +61,8 @@ void ThreadPool::complete()
     if (thread_pool.empty())
         return;
 
-    std::unique_lock<std::mutex> lock(pool_mutex);
-    complete_var.wait(lock, [this](){return n_busy == 0 && work_queue.empty();});
+    std::unique_lock< std::mutex > lock(pool_mutex);
+    complete_var.wait(lock, [this]() { return n_busy == 0 && work_queue.empty(); });
 }
 
 size_t ThreadPool::size() const

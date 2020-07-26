@@ -24,5 +24,5 @@ size_t DOF(const size_t elidx, const size_t elidy, const size_t locdofid)
     {
         return 2 * ((elidy + 1) * (mx + 1) + elidx - 3) + locdofid;
     }
-    throw std::logic_error{ "Lokalny stopien swobody musi nalezec do zakresu 0-7" };
+    throw std::logic_error{"Lokalny stopien swobody musi nalezec do zakresu 0-7"};
 }

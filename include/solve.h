@@ -1,20 +1,20 @@
 #ifndef KONKURS_SOLVE_H
 #define KONKURS_SOLVE_H
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <cmath>
 
-#include <memory>
-#include <iterator>
-#include <array>
-#include <vector>
-#include <utility>
 #include <algorithm>
-#include <numeric>
-#include <iostream>
-#include <fstream>
+#include <array>
 #include <execution>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <memory>
+#include <numeric>
+#include <utility>
+#include <vector>
 
 #include "MesLib.h"
 #include "ParLib.hpp"
@@ -22,4 +22,4 @@
 
 void solve(double*, const std::size_t);
 
-#endif //KONKURS_SOLVE_H
+#endif // KONKURS_SOLVE_H
